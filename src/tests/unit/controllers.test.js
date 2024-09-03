@@ -1,138 +1,151 @@
-// tests/unit/controllers.test.js
+// src/tests/unit/controllers.test.js
 
-import { getAllMembers, createMember, getAllRelationships, createRelationship } from '../../src/controllers/familyController.js';
-import * as familyService from '../../src/services/familyService.js';
+import {
+    getAllMembers,
+    createMember,
+    getAllRelationships,
+    createRelationship,
+} from '../../controllers/familyController.js';
+import * as familyService from '../../services/familyService.js';
 
-jest.mock('../../src/services/familyService.js'); // Mock the service layer
+// Mock the familyService module
+jest.mock('../../services/familyService.js');
 
-describe('Family Controllers', () => {
+describe('FamilyController', () => {
 
-    describe('getAllMembers', () => {
-        it('should return all family members', async () => {
-            const req = {};
-            const res = {
-                status: jest.fn().mockReturnThis(),
-                json: jest.fn(),
-            };
-            const mockMembers = [{ id: 1, first_name: 'John', last_name: 'Doe' }];
-            familyService.getAllMembers.mockResolvedValue(mockMembers);
-
-            await getAllMembers(req, res);
-
-            expect(familyService.getAllMembers).toHaveBeenCalled();
-            expect(res.status).toHaveBeenCalledWith(200);
-            expect(res.json).toHaveBeenCalledWith(mockMembers);
-        });
-
-        it('should return a 500 error if fetching members fails', async () => {
-            const req = {};
-            const res = {
-                status: jest.fn().mockReturnThis(),
-                json: jest.fn(),
-            };
-            familyService.getAllMembers.mockRejectedValue(new Error('Failed to fetch members'));
-
-            await getAllMembers(req, res);
-
-            expect(res.status).toHaveBeenCalledWith(500);
-            expect(res.json).toHaveBeenCalledWith({ error: 'Failed to fetch members' });
-        });
+    afterEach(() => {
+        jest.clearAllMocks();
     });
 
-    describe('createMember', () => {
-        it('should create a new family member', async () => {
-            const req = { body: { first_name: 'John', last_name: 'Doe', birth_date: '1990-01-01' } };
-            const res = {
-                status: jest.fn().mockReturnThis(),
-                json: jest.fn(),
-            };
-            const mockMember = { id: 1, ...req.body };
-            familyService.createMember.mockResolvedValue(mockMember);
+    // Tests for getAllMembers
+    test('should return all members with status 200', async () => {
+        const mockMembers = [{ id: 1, first_name: 'John', last_name: 'Doe' }];
+        familyService.getAllMembers.mockResolvedValue(mockMembers);
 
-            await createMember(req, res);
+        const req = {};
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+        };
 
-            expect(familyService.createMember).toHaveBeenCalledWith(req.body);
-            expect(res.status).toHaveBeenCalledWith(201);
-            expect(res.json).toHaveBeenCalledWith(mockMember);
-        });
+        await getAllMembers(req, res);
 
-        it('should return a 500 error if creating a member fails', async () => {
-            const req = { body: { first_name: 'John', last_name: 'Doe', birth_date: '1990-01-01' } };
-            const res = {
-                status: jest.fn().mockReturnThis(),
-                json: jest.fn(),
-            };
-            familyService.createMember.mockRejectedValue(new Error('Failed to create member'));
-
-            await createMember(req, res);
-
-            expect(res.status).toHaveBeenCalledWith(500);
-            expect(res.json).toHaveBeenCalledWith({ error: 'Failed to create member' });
-        });
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith(mockMembers);
     });
 
-    describe('getAllRelationships', () => {
-        it('should return all family relationships', async () => {
-            const req = {};
-            const res = {
-                status: jest.fn().mockReturnThis(),
-                json: jest.fn(),
-            };
-            const mockRelationships = [{ member_1_id: 1, member_2_id: 2, relationship: 'parent' }];
-            familyService.getAllRelationships.mockResolvedValue(mockRelationships);
+    test('should handle error in getAllMembers and return status 500', async () => {
+        familyService.getAllMembers.mockRejectedValue(new Error('Failed to fetch members'));
 
-            await getAllRelationships(req, res);
+        const req = {};
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+        };
 
-            expect(familyService.getAllRelationships).toHaveBeenCalled();
-            expect(res.status).toHaveBeenCalledWith(200);
-            expect(res.json).toHaveBeenCalledWith(mockRelationships);
-        });
+        await getAllMembers(req, res);
 
-        it('should return a 500 error if fetching relationships fails', async () => {
-            const req = {};
-            const res = {
-                status: jest.fn().mockReturnThis(),
-                json: jest.fn(),
-            };
-            familyService.getAllRelationships.mockRejectedValue(new Error('Failed to fetch relationships'));
-
-            await getAllRelationships(req, res);
-
-            expect(res.status).toHaveBeenCalledWith(500);
-            expect(res.json).toHaveBeenCalledWith({ error: 'Failed to fetch relationships' });
-        });
+        expect(res.status).toHaveBeenCalledWith(500);
+        expect(res.json).toHaveBeenCalledWith({ error: 'Failed to fetch members' });
     });
 
-    describe('createRelationship', () => {
-        it('should create a new family relationship', async () => {
-            const req = { body: { member_1_id: 1, member_2_id: 2, relationship: 'parent' } };
-            const res = {
-                status: jest.fn().mockReturnThis(),
-                json: jest.fn(),
-            };
-            const mockRelationship = { id: 1, ...req.body };
-            familyService.createRelationship.mockResolvedValue(mockRelationship);
+    // Tests for createMember
+    test('should create a new member and return status 201', async () => {
+        const newMember = { id: 1, first_name: 'John', last_name: 'Doe' };
+        familyService.createMember.mockResolvedValue(newMember);
 
-            await createRelationship(req, res);
+        const req = { body: { first_name: 'John', last_name: 'Doe' } };
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+        };
 
-            expect(familyService.createRelationship).toHaveBeenCalledWith(req.body);
-            expect(res.status).toHaveBeenCalledWith(201);
-            expect(res.json).toHaveBeenCalledWith(mockRelationship);
-        });
+        await createMember(req, res);
 
-        it('should return a 400 error if creating a relationship fails', async () => {
-            const req = { body: { member_1_id: 1, member_2_id: 2, relationship: 'parent' } };
-            const res = {
-                status: jest.fn().mockReturnThis(),
-                json: jest.fn(),
-            };
-            familyService.createRelationship.mockRejectedValue(new Error('Invalid relationship data'));
+        expect(res.status).toHaveBeenCalledWith(201);
+        expect(res.json).toHaveBeenCalledWith(newMember);
+    });
 
-            await createRelationship(req, res);
+    test('should handle error in createMember and return status 500', async () => {
+        familyService.createMember.mockRejectedValue(new Error('Failed to create member'));
 
-            expect(res.status).toHaveBeenCalledWith(400);
-            expect(res.json).toHaveBeenCalledWith({ error: 'Invalid relationship data' });
-        });
+        const req = { body: { first_name: 'John', last_name: 'Doe' } };
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+        };
+
+        await createMember(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(500);
+        expect(res.json).toHaveBeenCalledWith({ error: 'Failed to create member' });
+    });
+
+    // Tests for getAllRelationships
+    test('should return all relationships with status 200', async () => {
+        const mockRelationships = [
+            { id: 1, member_1_id: 1, member_2_id: 2, relationship: 'parent' }
+        ];
+        familyService.getAllRelationships.mockResolvedValue(mockRelationships);
+
+        const req = {};
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+        };
+
+        await getAllRelationships(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith(mockRelationships);
+    });
+
+    test('should handle error in getAllRelationships and return status 500', async () => {
+        familyService.getAllRelationships.mockRejectedValue(new Error('Failed to fetch relationships'));
+
+        const req = {};
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+        };
+
+        await getAllRelationships(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(500);
+        expect(res.json).toHaveBeenCalledWith({ error: 'Failed to fetch relationships' });
+    });
+
+    // Tests for createRelationship
+    test('should create a new relationship and return status 201', async () => {
+        const newRelationship = { id: 1, member_1_id: 1, member_2_id: 2, relationship: 'parent' };
+        familyService.createRelationship.mockResolvedValue(newRelationship);
+
+        const req = { body: { member_1_id: 1, member_2_id: 2, relationship: 'parent' } };
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+        };
+
+        await createRelationship(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(201);
+        expect(res.json).toHaveBeenCalledWith(newRelationship);
+    });
+
+    test('should handle error in createRelationship and return status 400', async () => {
+        const errorMessage = 'Parent cannot be younger than the child';
+        familyService.createRelationship.mockRejectedValue(new Error(errorMessage));
+
+        const req = { body: { member_1_id: 1, member_2_id: 2, relationship: 'parent' } };
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+        };
+
+        await createRelationship(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith({ error: errorMessage });
     });
 
 });
