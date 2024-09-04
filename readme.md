@@ -1,6 +1,3 @@
-Sure! Here’s a concise **`README.md`** for your backend project:
-
-```markdown
 # Family API
 
 A Node.js/Express backend for managing family members and their relationships, with a MySQL database and API documentation using Swagger.
