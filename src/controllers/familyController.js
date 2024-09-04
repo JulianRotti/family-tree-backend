@@ -34,6 +34,6 @@ export const createRelationship = async (req, res) => {
         const newRelationship = await familyService.createRelationship(req.body);
         res.status(201).json(newRelationship);
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        res.status(500).json({ error: 'Failed to create relationship' });
     }
 };

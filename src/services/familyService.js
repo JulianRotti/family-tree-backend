@@ -10,17 +10,7 @@ export const createMember = async (memberData) => {
 export const createRelationship = async (relationshipData) => {
     const { member_1_id, member_2_id, relationship } = relationshipData;
 
-    // Validate the relationship logic
-    if (relationship === 'parent') {
-        const parent = await Member.findByPk(member_1_id);
-        const child = await Member.findByPk(member_2_id);
-
-        if (new Date(parent.birth_date) > new Date(child.birth_date)) {
-            throw new Error('Parent cannot be younger than the child');
-        }
-    }
-
-    // Only pass member_1_id, member_2_id, and relationship
+    // Core business logic (e.g., database interaction)
     return await Relationship.create({ member_1_id, member_2_id, relationship });
 };
 
