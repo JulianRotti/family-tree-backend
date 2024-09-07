@@ -1,0 +1,203 @@
+openapi: 3.0.0
+info:
+  title: Family Tree API
+  version: 1.0.0
+  description: API to manage family trees and relationships.
+
+paths:
+  /api/family/members:
+    get:
+      summary: Retrieve all family members
+      description: Fetches all family members from the database.
+      responses:
+        200:
+          description: A list of family members.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Member'
+        500:
+          description: Failed to fetch members.
+
+    post:
+      summary: Create a new family member
+      description: Adds a new member to the family.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MemberInput'
+      responses:
+        201:
+          description: Created a new family member.
+        500:
+          description: Failed to create member.
+
+  /api/family/relationships:
+    get:
+      summary: Retrieve all relationships
+      description: Fetches all relationships between family members.
+      responses:
+        200:
+          description: A list of relationships.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Relationship'
+        500:
+          description: Failed to fetch relationships.
+
+    post:
+      summary: Create a new relationship
+      description: Adds a new relationship between family members.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RelationshipInput'
+      responses:
+        201:
+          description: Created a new relationship.
+        500:
+          description: Failed to create relationship.
+
+  /api/family/family-tree/{id}:
+    get:
+      summary: Retrieve family tree by member ID
+      description: Fetches the family tree structure for a given member ID.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: ID of the member whose family tree is being fetched.
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Family tree structure.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  family_tree_by_id:
+                    $ref: '#/components/schemas/MemberTree'
+                  members:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Member'
+        500:
+          description: Failed to fetch family tree.
+
+components:
+  schemas:
+    Member:
+      type: object
+      properties:
+        id:
+          type: integer
+        first_name:
+          type: string
+          example: "John"
+        last_name:
+          type: string
+          example: "Doe"
+        initial_last_name:
+          type: string
+          example: "Smith"
+        birth_date:
+          type: string
+          format: date
+          example: "1990-01-01"
+        death_date:
+          type: string
+          format: date
+          nullable: true
+          example: "2070-01-01"
+
+    MemberInput:
+      type: object
+      required:
+        - first_name
+        - last_name
+        - birth_date
+      properties:
+        first_name:
+          type: string
+          example: "John"
+        last_name:
+          type: string
+          example: "Doe"
+        initial_last_name:
+          type: string
+          nullable: true
+          example: "Smith"
+        birth_date:
+          type: string
+          format: date
+          example: "1990-01-01"
+        death_date:
+          type: string
+          format: date
+          nullable: true
+          example: "2070-01-01"
+
+    Relationship:
+      type: object
+      properties:
+        member_1_id:
+          type: integer
+          example: 1
+        member_2_id:
+          type: integer
+          example: 2
+        relationship:
+          type: string
+          enum:
+            - parent
+            - spouse
+          example: "parent"
+
+    RelationshipInput:
+      type: object
+      required:
+        - member_1_id
+        - member_2_id
+        - relationship
+      properties:
+        member_1_id:
+          type: integer
+          example: 1
+        member_2_id:
+          type: integer
+          example: 2
+        relationship:
+          type: string
+          enum:
+            - parent
+            - spouse
+          example: "parent"
+
+    MemberTree:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        family:
+          type: object
+          properties:
+            spouse:
+              type: integer
+              example: 2  # Example spouse ID
+            children:
+              type: array
+              items:
+                $ref: '#/components/schemas/MemberTree'  # Recursive children
+

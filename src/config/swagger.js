@@ -15,7 +15,7 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: 'http://localhost:3000', // Your local development URL
+        url: 'http://localhost:5000', // Your local development URL
         description: 'Local server'
       }
     ],
