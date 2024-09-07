@@ -2,6 +2,8 @@
 
 import express from 'express';
 import { convertIdToInt } from '../middleware/convertId.js';  // Import the middleware
+import { validateMember } from '../middleware/validateMember.js';
+import { validateRelationship } from '../middleware/validateRelationship.js';
 import {
     getAllMembers,
     createMember,
@@ -17,9 +19,9 @@ router.param('id', convertIdToInt);
 
 // Define the routes
 router.get('/members', getAllMembers);
-router.post('/members', createMember);
+router.post('/members', validateMember, createMember);
 router.get('/relationships', getAllRelationships);
-router.post('/relationships', createRelationship);
+router.post('/relationships', validateRelationship, createRelationship);
 router.get('/family-tree/:id', getFamilyTreeById);
 
 export default router;
