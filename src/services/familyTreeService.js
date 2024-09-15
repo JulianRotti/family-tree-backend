@@ -12,41 +12,71 @@ const findSpouse = (id, relationships) => {
     });
 };
 
-// Updated findChildren function to find children from both id_1 and id_2
-const findChildren = (id_1, id_2, relationships) => {
-    return relationships.filter((relationship) => {
-        return relationship.relationship === 'parent' && 
-               (relationship.member_1_id === id_1 || relationship.member_1_id === id_2);
-    });
+// Helper function to find all children for a given parent
+const findChildrenForParent = (parentId, relationships) => {
+    return relationships
+        .filter((relationship) => {
+            return relationship.relationship === 'parent' && relationship.member_1_id === parentId;
+        })
+        .map((relationship) => relationship.member_2_id);  // Return only child IDs
 };
 
-// Recursive function to build the family tree (IDs only)
-const buildFamilyTreeWithIds = (id, relationships) => {
-    // Start with the member's ID
-    const memberData = {
-        id: id,
-        family: []
-    };
+// Updated findChildren function to return only children shared by both id_1 and id_2
+const findChildren = (id_1, id_2, relationships) => {
+    // Get children of both parents
+    const childrenOfId1 = findChildrenForParent(id_1, relationships);
+    const childrenOfId2 = findChildrenForParent(id_2, relationships);
 
-    // Find spouse
-    findSpouse(id, relationships).forEach((relationship) => {
-        const spouseId = relationship.member_1_id === id ? relationship.member_2_id : relationship.member_1_id;
-        const children = [];
-        findChildren(id, spouseId, relationships).forEach((relationship) => {
-            const childId = relationship.member_2_id;
+    // Return the intersection of both sets of children (shared children)
+    return childrenOfId1.filter((childId) => childrenOfId2.includes(childId));
+};
+
+
+
+// Recursive function to build the family tree (IDs only) with multiple spouses
+const buildFamilyTreeWithIds = (id, relationships) => {
+    const memberData = { id, family: [] };
+
+    // Find spouses
+    const spouses = findSpouse(id, relationships);
+
+    // For each spouse, find children and build family structure
+    spouses.forEach((relationship) => {
+        let spouseId = null;
+
+        if (relationship.member_1_id === id) {
+            spouseId = relationship.member_2_id;
+        } else if (relationship.member_2_id === id) {
+            spouseId = relationship.member_1_id;
+        }
+
+        // For each spouse, find the children shared with that spouse
+        const children = findChildren(id, spouseId, relationships).map((childId) => {
+            // Recursively build the child's family tree
             const childTree = buildFamilyTreeWithIds(childId, relationships);
-            if (childTree) {
-                children.push(childTree);
-            }
+
+            // Ensure the child's ID is present and its family is correct
+            return {
+                id: childId,  // Include the child’s ID in the response
+                family: childTree.family || []  // Include their family if they have one, otherwise an empty array
+            };
         });
+
+        // Add spouse and children as a new family object
         memberData.family.push({
             spouse: spouseId,
             children: children
-        })
+        });
     });
-    
+
+    // Simplify the structure: if no family members (spouses or children), set family to null
+    if (memberData.family.length === 0) {
+        memberData.family = null;
+    }
+
     return memberData;
 };
+
 
 
 // Fetch family tree by member ID

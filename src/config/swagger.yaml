@@ -191,13 +191,14 @@ components:
           type: integer
           example: 1
         family:
-          type: object
-          properties:
-            spouse:
-              type: integer
-              example: 2  # Example spouse ID
-            children:
-              type: array
-              items:
-                $ref: '#/components/schemas/MemberTree'  # Recursive children
-
+          type: array               # Changed from object to array
+          items:
+            type: object
+            properties:
+              spouse:
+                type: integer
+                example: 2          # Example spouse ID
+              children:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MemberTree'  # Recursive reference for children
