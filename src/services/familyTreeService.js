@@ -5,10 +5,18 @@ import Member from '../models/members.js';
 import Relationship from '../models/relationships.js';
 
 // Helper function to find relationships for a given member
-const findRelationships = (id, relationships, relationshipType) => {
+const findSpouse = (id, relationships) => {
     return relationships.filter((relationship) => {
-        return relationship.relationship === relationshipType &&
+        return relationship.relationship === "spouse" &&
                (relationship.member_1_id === id || relationship.member_2_id === id);
+    });
+};
+
+// Updated findChildren function to find children from both id_1 and id_2
+const findChildren = (id_1, id_2, relationships) => {
+    return relationships.filter((relationship) => {
+        return relationship.relationship === 'parent' && 
+               (relationship.member_1_id === id_1 || relationship.member_1_id === id_2);
     });
 };
 
@@ -17,38 +25,29 @@ const buildFamilyTreeWithIds = (id, relationships) => {
     // Start with the member's ID
     const memberData = {
         id: id,
-        family: {
-            spouse: null,
-            children: []
-        }
+        family: []
     };
 
-    // Find spouse and children
-    findRelationships(id, relationships, 'spouse').forEach((relationship) => {
-        if (relationship.member_1_id === id) {
-            memberData.family.spouse = relationship.member_2_id;
-        } else if (relationship.member_2_id === id) {
-            memberData.family.spouse = relationship.member_1_id;
-        }
-    });
-
-    findRelationships(id, relationships, 'parent').forEach((relationship) => {
-        if (relationship.member_1_id === id) {
-            // Add the child's ID recursively
-            const childTree = buildFamilyTreeWithIds(relationship.member_2_id, relationships);
+    // Find spouse
+    findSpouse(id, relationships).forEach((relationship) => {
+        const spouseId = relationship.member_1_id === id ? relationship.member_2_id : relationship.member_1_id;
+        const children = [];
+        findChildren(id, spouseId, relationships).forEach((relationship) => {
+            const childId = relationship.member_2_id;
+            const childTree = buildFamilyTreeWithIds(childId, relationships);
             if (childTree) {
-                memberData.family.children.push(childTree);
+                children.push(childTree);
             }
-        }
+        });
+        memberData.family.push({
+            spouse: spouseId,
+            children: children
+        })
     });
-
-    // Simplify the structure: if no spouse and no children, set family to null
-    if (!memberData.family.spouse && memberData.family.children.length === 0) {
-        memberData.family = null;
-    }
-
+    
     return memberData;
 };
+
 
 // Fetch family tree by member ID
 export const getFamilyTreeById = async (id) => {
