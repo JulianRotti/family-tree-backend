@@ -1,5 +1,3 @@
-// tests/routes/familyRoutes.test.js
-
 import request from 'supertest';
 import express from 'express';
 import familyRoutes from '../../routes/familyRoutes';
@@ -21,21 +19,23 @@ describe('Family Routes', () => {
 
     describe('POST /members', () => {
         it('should validate member and return 400 if birth_date is invalid', async () => {
+            // Update the test to include valid first_name and last_name
             const response = await request(app)
                 .post('/members')
-                .send({ birth_date: '', name: 'John Doe' });
+                .send({ first_name: 'John', last_name: 'Doe', birth_date: '' });
 
             expect(response.status).toBe(400);
             expect(response.body.error).toBe('Invalid or missing birth date');
         });
 
         it('should create a member and return 201', async () => {
-            const mockMember = { id: 1, name: 'John Doe' };
+            const mockMember = { id: 1, first_name: 'John', last_name: 'Doe' };
             familyService.createMember.mockResolvedValue(mockMember);
 
+            // Include valid first_name, last_name, and birth_date in the request
             const response = await request(app)
                 .post('/members')
-                .send({ birth_date: '1990-01-01', name: 'John Doe' });
+                .send({ first_name: 'John', last_name: 'Doe', birth_date: '1990-01-01' });
 
             expect(response.status).toBe(201);
             expect(response.body).toEqual(mockMember);
@@ -44,7 +44,7 @@ describe('Family Routes', () => {
 
     describe('GET /members', () => {
         it('should return 200 and the list of members', async () => {
-            const mockMembers = [{ id: 1, name: 'John Doe' }];
+            const mockMembers = [{ id: 1, first_name: 'John', last_name: 'Doe' }];
             familyService.getAllMembers.mockResolvedValue(mockMembers);
 
             const response = await request(app).get('/members');

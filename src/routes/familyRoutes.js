@@ -1,7 +1,7 @@
 // src/routes/familyRoutes.js
 
 import express from 'express';
-import { convertIdToInt } from '../middleware/convertId.js';  // Import the middleware
+import { convertIdAndValidateQuery } from '../middleware/convertIdAndValidateQuery.js';  // Import the updated middleware
 import { validateMember } from '../middleware/validateMember.js';
 import { validateRelationship } from '../middleware/validateRelationship.js';
 import {
@@ -14,14 +14,13 @@ import {
 
 const router = express.Router();
 
-// Apply the middleware to automatically convert `id` to an integer
-router.param('id', convertIdToInt);
+// Apply the middleware to validate `id` and query parameters (w_node, w_partner, w_children)
+router.get('/family-tree/:id', convertIdAndValidateQuery, getFamilyTreeById);
 
-// Define the routes
+// Define other routes
 router.get('/members', getAllMembers);
 router.post('/members', validateMember, createMember);
 router.get('/relationships', getAllRelationships);
 router.post('/relationships', validateRelationship, createRelationship);
-router.get('/family-tree/:id', getFamilyTreeById);
 
 export default router;

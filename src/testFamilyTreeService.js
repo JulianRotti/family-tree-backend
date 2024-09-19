@@ -7,7 +7,7 @@ import sequelize from './config/database.js';  // Correct path for the Sequelize
 const testFamilyTreeService = async (memberId) => {
   try {
     // Call the service and pass the test member ID
-    const familyTree = await getFamilyTreeById(memberId);
+    const familyTree = await getFamilyTreeById(memberId, 1, 2, 3);
 
     // Log the results to see if the data is returned correctly
     console.log('Family Tree for Member ID:', memberId);
@@ -25,5 +25,5 @@ const testFamilyTreeService = async (memberId) => {
 };
 
 // Provide a test member ID
-const testMemberId = 4;  // Change this ID to whatever is available in your DB
+const testMemberId = 1;  // Change this ID to whatever is available in your DB
 testFamilyTreeService(testMemberId);

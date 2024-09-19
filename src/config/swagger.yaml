@@ -78,6 +78,24 @@ paths:
           description: ID of the member whose family tree is being fetched.
           schema:
             type: integer
+        - in: query
+          name: w_node
+          required: false
+          description: Width of a node in the family tree.
+          schema:
+            type: integer
+        - in: query
+          name: w_partner
+          required: false
+          description: Space between the node and its spouse.
+          schema:
+            type: integer
+        - in: query
+          name: w_children
+          required: false
+          description: Space between children in the family tree.
+          schema:
+            type: integer
       responses:
         200:
           description: Family tree structure.
@@ -190,14 +208,17 @@ components:
         id:
           type: integer
           example: 1
+        subtree_len:
+          type: integer
+          example: 100  # Example of subtree length for visualization
         family:
-          type: array               # Changed from object to array
+          type: array
           items:
             type: object
             properties:
               spouse:
                 type: integer
-                example: 2          # Example spouse ID
+                example: 2  # Example spouse ID
               children:
                 type: array
                 items:
