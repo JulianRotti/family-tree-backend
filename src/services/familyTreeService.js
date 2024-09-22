@@ -6,19 +6,21 @@ import Relationship from '../models/relationships.js';
 
 // Helper function to find relationships for a given member
 const findSpouse = (id, relationships) => {
-    return relationships.filter((relationship) => {
+    const spouseRelationships = relationships.filter((relationship) => {
         return relationship.relationship === "spouse" &&
                (relationship.member_1_id === id || relationship.member_2_id === id);
     });
+    return spouseRelationships;
 };
 
 // Helper function to find all children for a given parent
 const findChildrenForParent = (parentId, relationships) => {
-    return relationships
+    const children = relationships
         .filter((relationship) => {
             return relationship.relationship === 'parent' && relationship.member_1_id === parentId;
         })
         .map((relationship) => relationship.member_2_id);  // Return only child IDs
+    return children
 };
 
 // Updated findChildren function to return only children shared by both id_1 and id_2

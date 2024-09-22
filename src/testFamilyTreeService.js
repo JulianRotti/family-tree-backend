@@ -14,7 +14,7 @@ const testFamilyTreeService = async (memberId) => {
     
     // Use JSON.stringify to display the full nested structure
     console.log('Family Tree:', JSON.stringify(familyTree.family_tree_by_id, null, 2));  // Pretty print with 2 spaces
-    console.log('Members:', familyTree.members);
+    // console.log('Members:', familyTree.members);
 
   } catch (error) {
     console.error('Error fetching family tree:', error.message);
@@ -25,5 +25,5 @@ const testFamilyTreeService = async (memberId) => {
 };
 
 // Provide a test member ID
-const testMemberId = 1;  // Change this ID to whatever is available in your DB
+const testMemberId = 8;  // Change this ID to whatever is available in your DB
 testFamilyTreeService(testMemberId);
