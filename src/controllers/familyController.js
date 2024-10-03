@@ -13,6 +13,21 @@ export const getAllMembers = async (req, res) => {
     }
 };
 
+// Fetch members by first_name, last_name, and birth_date (use req.query)
+export const getMemberByAttributes = async (req, res) => {
+    const { first_name, last_name, birth_date } = req.query; // Use query parameters
+    try {
+        const member = await familyService.getMemberByAttributes(first_name, last_name, birth_date);
+        if (member) {
+            res.status(200).json(member);
+        } else {
+            res.status(404).json({ error: 'Member not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch member' });
+    }
+};
+
 // Create a new member
 export const createMember = async (req, res) => {
     try {
@@ -30,6 +45,21 @@ export const getAllRelationships = async (req, res) => {
         res.status(200).json(relationships);
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch relationships' });
+    }
+};
+
+// Fetch relationships by member_1_id, member_2_id, and relationship (use req.query)
+export const getRelationshipByAttributes = async (req, res) => {
+    const { member_1_id, member_2_id, relationship } = req.query; // Use query parameters
+    try {
+        const relationshipData = await familyService.getRelationshipByAttributes(member_1_id, member_2_id, relationship);
+        if (relationshipData) {
+            res.status(200).json(relationshipData);
+        } else {
+            res.status(404).json({ error: 'Relationship not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch relationship' });
     }
 };
 

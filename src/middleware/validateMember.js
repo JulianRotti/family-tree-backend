@@ -1,8 +1,8 @@
 // src/middlewares/validateMember.js
 
-export const validateMember = (req, res, next) => {
+import { getMemberByAttributes } from '../services/familyService.js';
 
-
+export const validateMember = async (req, res, next) => {
     const { first_name, last_name, birth_date, death_date } = req.body;
 
     // Regex to match names with alphabetic characters and hyphens, but no numbers or spaces
@@ -33,6 +33,20 @@ export const validateMember = (req, res, next) => {
         return res.status(400).json({ error: 'Birth date cannot be after death date' });
     }
 
-    // If validation passes, move on to the next middleware or controller
-    next();
+    try {
+        // Check if the member already exists in the database
+        const existingMember = await getMemberByAttributes(first_name, last_name, birth_date);
+
+        // If member already exists, return an error
+        if (existingMember) {
+            return res.status(400).json({ error: 'A member with the same first name, last name, and birth date already exists.' });
+        }
+
+        // If validation passes and no duplicate is found, move on to the next middleware or controller
+        next();
+    } catch (error) {
+        // Handle any database or internal server errors
+        return res.status(500).json({ error: 'Server error while validating member' });
+    }
 };
+
