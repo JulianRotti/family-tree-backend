@@ -33,6 +33,8 @@ paths:
       responses:
         201:
           description: Created a new family member.
+        400:
+          description: Validation error - missing or invalid fields.
         500:
           description: Failed to create member.
 
@@ -64,6 +66,8 @@ paths:
       responses:
         201:
           description: Created a new relationship.
+        400:
+          description: Validation error - invalid relationship or duplicate.
         500:
           description: Failed to create relationship.
 
@@ -110,6 +114,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Member'
+        400:
+          description: Invalid ID format.
         500:
           description: Failed to fetch family tree.
 
@@ -128,6 +134,7 @@ components:
           example: "Doe"
         initial_last_name:
           type: string
+          nullable: true
           example: "Smith"
         birth_date:
           type: string
@@ -138,6 +145,29 @@ components:
           format: date
           nullable: true
           example: "2070-01-01"
+        birth_city:
+          type: string
+          example: "Berlin"
+        birth_country:
+          type: string
+          example: "Germany"
+        email:
+          type: string
+          format: email
+          example: "john.doe@example.com"
+        telephone:
+          type: string
+          pattern: "^[0-9+\\s()-]{7,20}$"
+          example: "+49 30 12345678"
+        street_number:
+          type: string
+          example: "Hauptstraße 12"
+        plz:
+          type: string
+          example: "10115"
+        city:
+          type: string
+          example: "Berlin"
 
     MemberInput:
       type: object
@@ -145,6 +175,8 @@ components:
         - first_name
         - last_name
         - birth_date
+        - birth_city
+        - birth_country
       properties:
         first_name:
           type: string
@@ -165,6 +197,29 @@ components:
           format: date
           nullable: true
           example: "2070-01-01"
+        birth_city:
+          type: string
+          example: "Berlin"
+        birth_country:
+          type: string
+          example: "Germany"
+        email:
+          type: string
+          format: email
+          example: "john.doe@example.com"
+        telephone:
+          type: string
+          pattern: "^[0-9+\\s()-]{7,20}$"
+          example: "+49 30 12345678"
+        street_number:
+          type: string
+          example: "Hauptstraße 12"
+        plz:
+          type: string
+          example: "10115"
+        city:
+          type: string
+          example: "Berlin"
 
     Relationship:
       type: object
@@ -210,7 +265,7 @@ components:
           example: 1
         subtree_len:
           type: integer
-          example: 100  # Example of subtree length for visualization
+          example: 100
         family:
           type: array
           items:
@@ -218,8 +273,8 @@ components:
             properties:
               spouse:
                 type: integer
-                example: 2  # Example spouse ID
+                example: 2
               children:
                 type: array
                 items:
-                  $ref: '#/components/schemas/MemberTree'  # Recursive reference for children
+                  $ref: '#/components/schemas/MemberTree'

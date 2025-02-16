@@ -11,16 +11,17 @@ import {
     createRelationship,
     getFamilyTreeById
 } from '../controllers/familyController.js';
+import { validateTokenAndRole } from '../middleware/validateTokenAndRole.js'
 
 const router = express.Router();
 
 // Apply the middleware to validate `id` and query parameters (w_node, w_partner, w_children)
-router.get('/family-tree/:id', convertIdAndValidateQuery, getFamilyTreeById);
+router.get('/family-tree/:id', validateTokenAndRole('editor'), convertIdAndValidateQuery, getFamilyTreeById);
 
 // Define other routes
-router.get('/members', getAllMembers);
-router.post('/members', validateMember, createMember);
-router.get('/relationships', getAllRelationships);
-router.post('/relationships', validateRelationship, createRelationship);
+router.get('/members', validateTokenAndRole('viewer'), getAllMembers);
+router.post('/members', validateTokenAndRole('editor'), validateMember, createMember);
+router.get('/relationships', validateTokenAndRole('viewer'), getAllRelationships);
+router.post('/relationships', validateTokenAndRole('editor'), validateRelationship, createRelationship);
 
 export default router;

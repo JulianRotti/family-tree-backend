@@ -1,6 +1,10 @@
 import Member from '../models/members.js';
 import Relationship from '../models/relationships.js';
 
+/* Todos
+- add modify / put endpoit for members and relationships
+- add delete endpoint for members and relationships
+*/
 export const createMember = async (memberData) => {
     return await Member.create(memberData);
 };

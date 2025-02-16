@@ -2,51 +2,57 @@
 
 import { getMemberByAttributes } from '../services/familyService.js';
 
+// Define regex patterns for validation
+const nameRegex = /^[A-Za-zÄÖÜäöüß-]+$/; // Allows letters, hyphens, and German umlauts
+const cityRegex = /^[A-Za-zÄÖÜäöüß()\s-]+$/; // Allows letters, hyphens, spaces, parentheses, and umlauts
+const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; // Standard email format
+const telephoneRegex = /^[0-9+\s()-]{7,20}$/; // Allows digits, spaces, +, (), - (7-20 characters)
+const streetNumberRegex = /^[A-Za-zÄÖÜäöüß\s.-]+\s\d+[A-Za-z]?$/; // Matches "Müllerstraße 12", "Hauptstr. 5", "Goethe-Straße 7A"
+
 export const validateMember = async (req, res, next) => {
-    const { first_name, last_name, birth_date, death_date } = req.body;
+    const {
+        first_name, last_name, birth_date, death_date, birth_city, birth_country, 
+        email, telephone, street_number, plz, city
+    } = req.body;
 
-    // Regex to match names with alphabetic characters and hyphens, but no numbers or spaces
-    const nameRegex = /^[A-Za-z-]+$/;
+    // Validate required fields
+    if (!first_name) return res.status(400).json({ error: 'Vorname ist nicht angegeben.' });
+    if (!last_name) return res.status(400).json({ error: 'Nachname ist nicht angegeben.' });
+    if (!birth_date) return res.status(400).json({ error: 'Geburtsdatum ist nicht angegeben.' });
+    if (!birth_city) return res.status(400).json({ error: 'Geburtsort ist nicht angegeben.' });
+    if (!birth_country) return res.status(400).json({ error: 'Geburtsland ist nicht angegeben.' });
 
-    // Ensure first_name is provided and matches the regex
-    if (!first_name || !nameRegex.test(first_name)) {
-        return res.status(400).json({ error: 'Invalid first name. Only letters and hyphens are allowed.' });
-    }
+    // Validate name, city, and country fields
+    if (!nameRegex.test(first_name)) return res.status(400).json({ error: 'Vorname enthält unerlaubte Zeichen.' });
+    if (!nameRegex.test(last_name)) return res.status(400).json({ error: 'Nachname enthält unerlaubte Zeichen.' });
+    if (!cityRegex.test(birth_city)) return res.status(400).json({ error: 'Geburtsort enthält unerlaubte Zeichen.' });
+    if (!cityRegex.test(birth_country)) return res.status(400).json({ error: 'Geburtsland enthält unerlaubte Zeichen.' });
 
-    // Ensure last_name is provided and matches the regex
-    if (!last_name || !nameRegex.test(last_name)) {
-        return res.status(400).json({ error: 'Invalid last name. Only letters and hyphens are allowed.' });
-    }
-
-    // Ensure birth_date is provided and is a valid date
-    if (!birth_date || isNaN(Date.parse(birth_date))) {
-        return res.status(400).json({ error: 'Invalid or missing birth date' });
-    }
-
-    // Check if death_date is provided and validate it, if present
-    if (death_date && isNaN(Date.parse(death_date))) {
-        return res.status(400).json({ error: 'Invalid death date' });
-    }
-
-    // Ensure birth_date is not after death_date
+    // Validate dates (correct format & logical order)
+    if (isNaN(Date.parse(birth_date))) return res.status(400).json({ error: 'Geburtsdatum ist nicht valide.' });
+    if (death_date && isNaN(Date.parse(death_date))) return res.status(400).json({ error: 'Sterbedatum ist nicht valide.' });
     if (death_date && new Date(birth_date) > new Date(death_date)) {
-        return res.status(400).json({ error: 'Birth date cannot be after death date' });
+        return res.status(400).json({ error: 'Geburtsdatum darf nicht nach dem Sterbedatum liegen.' });
     }
+
+    // Validate optional fields if provided
+    if (email && !emailRegex.test(email)) return res.status(400).json({ error: 'Ungültige E-Mail-Adresse.' });
+    if (telephone && !telephoneRegex.test(telephone)) return res.status(400).json({ error: 'Ungültige Telefonnummer.' });
+    if (street_number && !streetNumberRegex.test(street_number)) {
+        return res.status(400).json({ error: 'Straßenname und Hausnummer sind ungültig. (z. B. Müllerstraße 12 oder Hauptstr. 5)' });
+    }
+    if (city && !cityRegex.test(city)) return res.status(400).json({ error: 'Stadtname enthält unerlaubte Zeichen.' });
 
     try {
-        // Check if the member already exists in the database
+        // heck if a member with the same name and birth date already exists
         const existingMember = await getMemberByAttributes(first_name, last_name, birth_date);
-
-        // If member already exists, return an error
         if (existingMember) {
-            return res.status(400).json({ error: 'A member with the same first name, last name, and birth date already exists.' });
+            return res.status(400).json({ error: 'Ein Mitglied mit demselben Namen und Geburtsdatum existiert bereits.' });
         }
 
-        // If validation passes and no duplicate is found, move on to the next middleware or controller
+        // If all validations pass, proceed to the next middleware
         next();
     } catch (error) {
-        // Handle any database or internal server errors
-        return res.status(500).json({ error: 'Server error while validating member' });
+        return res.status(500).json({ error: 'Serverfehler bei der Mitgliedsvalidierung.' });
     }
 };
-
