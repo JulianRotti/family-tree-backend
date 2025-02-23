@@ -9,6 +9,14 @@ export const createMember = async (memberData) => {
     return await Member.create(memberData);
 };
 
+export const updateMember = async (memberData) => {
+    const { id, ...updateFields } = memberData;
+    const [updatedRows] = await Member.update(updateFields, { where: { id } });
+
+    return updatedRows > 0; // Returns true if a row was updated, false otherwise
+};
+
+
 export const createRelationship = async (relationshipData) => {
     const { member_1_id, member_2_id, relationship } = relationshipData;
 

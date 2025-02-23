@@ -1,13 +1,4 @@
-export const convertIdAndValidateQuery = (req, res, next) => {
-
-    // Validate and convert `id` to an integer
-    const parsedId = parseInt(req.params.id, 10);
-
-    // If the parsed ID is not a valid integer, return an error
-    if (isNaN(parsedId)) {
-        return res.status(400).json({ error: 'Invalid ID format, must be an integer' });
-    }
-    req.params.id = parsedId;  // Replace the string ID with the integer value
+export const validateFamilyTreeQuery = (req, res, next) => {
 
     // Validate query parameters: w_node, w_partner, w_children (optional but must be integers if provided)
     const w_node = req.query.w_node ? parseInt(req.query.w_node, 10) : undefined;

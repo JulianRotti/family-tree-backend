@@ -9,6 +9,25 @@ const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; // Standa
 const telephoneRegex = /^[0-9+\s()-]{7,20}$/; // Allows digits, spaces, +, (), - (7-20 characters)
 const streetNumberRegex = /^[A-Za-zÄÖÜäöüß\s.-]+\s\d+[A-Za-z]?$/; // Matches "Müllerstraße 12", "Hauptstr. 5", "Goethe-Straße 7A"
 
+export const validateDoubleMember = async (req, res, next) => {
+    const {
+        first_name, last_name, birth_date
+    } = req.body;
+    
+    try {
+        // heck if a member with the same name and birth date already exists
+        const existingMember = await getMemberByAttributes(first_name, last_name, birth_date);
+        if (existingMember) {
+            return res.status(200).json({ notice: 'Ein Mitglied mit demselben Namen und Geburtsdatum existiert bereits.' });
+        }
+
+        // If all validations pass, proceed to the next middleware
+        next();
+    } catch (error) {
+        return res.status(500).json({ error: 'Serverfehler bei der Mitgliedsvalidierung.' });
+    }
+};   
+
 export const validateMember = async (req, res, next) => {
     const {
         first_name, last_name, birth_date, death_date, birth_city, birth_country, 
@@ -43,16 +62,5 @@ export const validateMember = async (req, res, next) => {
     }
     if (city && !cityRegex.test(city)) return res.status(400).json({ error: 'Stadtname enthält unerlaubte Zeichen.' });
 
-    try {
-        // heck if a member with the same name and birth date already exists
-        const existingMember = await getMemberByAttributes(first_name, last_name, birth_date);
-        if (existingMember) {
-            return res.status(400).json({ error: 'Ein Mitglied mit demselben Namen und Geburtsdatum existiert bereits.' });
-        }
-
-        // If all validations pass, proceed to the next middleware
-        next();
-    } catch (error) {
-        return res.status(500).json({ error: 'Serverfehler bei der Mitgliedsvalidierung.' });
-    }
+    next();
 };

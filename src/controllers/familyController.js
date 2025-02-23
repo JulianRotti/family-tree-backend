@@ -9,7 +9,20 @@ export const getAllMembers = async (req, res) => {
         const members = await familyService.getAllMembers();
         res.status(200).json(members);
     } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch members' });
+        res.status(500).json({ error: `Fehler beim Abrufen der Mitglieder: ${error}.` });
+    }
+};
+
+export const updateMember = async (req, res) => {
+    try {
+        const updated = await familyService.updateMember(req.body);
+        if (updated) {
+            res.status(200).json({ message: 'Familienmitglied aktualisiert.' });
+        } else {
+            res.status(404).json({ error: 'Kein Familienmitglied mit dieser ID.' });
+        }
+    } catch (error) {
+        res.status(500).json({ error: `Fehler beim Aktualisieren des Familienmitglieds: ${error}.` });
     }
 };
 
@@ -21,10 +34,10 @@ export const getMemberByAttributes = async (req, res) => {
         if (member) {
             res.status(200).json(member);
         } else {
-            res.status(404).json({ error: 'Member not found' });
+            res.status(404).json({ error: 'Mitglied nicht gefunden.' });
         }
     } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch member' });
+        res.status(500).json({ error: `Fehler beim Abrufen des Mitglieds: ${error}.` });
     }
 };
 
@@ -34,7 +47,7 @@ export const createMember = async (req, res) => {
         const newMember = await familyService.createMember(req.body);
         res.status(201).json(newMember);
     } catch (error) {
-        res.status(500).json({ error: 'Failed to create member' });
+        res.status(500).json({ error: `Fehler beim Erstellen des Mitglieds: ${error}.` });
     }
 };
 
@@ -44,7 +57,7 @@ export const getAllRelationships = async (req, res) => {
         const relationships = await familyService.getAllRelationships();
         res.status(200).json(relationships);
     } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch relationships' });
+        res.status(500).json({ error: `Fehler beim Abrufen der Beziehungen: ${error}.` });
     }
 };
 
@@ -56,10 +69,10 @@ export const getRelationshipByAttributes = async (req, res) => {
         if (relationshipData) {
             res.status(200).json(relationshipData);
         } else {
-            res.status(404).json({ error: 'Relationship not found' });
+            res.status(404).json({ error: 'Beziehung nicht gefunden.' });
         }
     } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch relationship' });
+        res.status(500).json({ error: `Fehler beim Abrufen der Beziehung: ${error}.` });
     }
 };
 
@@ -69,7 +82,7 @@ export const createRelationship = async (req, res) => {
         const newRelationship = await familyService.createRelationship(req.body);
         res.status(201).json(newRelationship);
     } catch (error) {
-        res.status(500).json({ error: 'Failed to create relationship' });
+        res.status(500).json({ error: `Fehler beim Erstellen der Beziehung: ${error}.` });
     }
 };
 
@@ -87,6 +100,6 @@ export const getFamilyTreeById = async (req, res) => {
         const familyTree = await familyTreeService.getFamilyTreeById(id, w_node, w_partner, w_children);
         res.status(200).json(familyTree);
     } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch family tree' });
+        res.status(500).json({ error: `Fehler beim Abrufen des Stammbaums: ${error}.` });
     }
 };

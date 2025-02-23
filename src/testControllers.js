@@ -1,5 +1,5 @@
 // Import the controller functions you want to test
-import { getMemberByAttributes, getRelationshipByAttributes } from './controllers/familyController.js';
+import { getMemberByAttributes, getRelationshipByAttributes, updateMember } from './controllers/familyController.js';
 
 // Simulate the test function to call the controller for fetching a member by attributes
 const testGetMemberByAttribute = async (first_name, last_name, birth_date) => {
@@ -63,8 +63,37 @@ const testGetRelationshipByAttributes = async (member_1_id, member_2_id, relatio
   }
 };
 
+const testUpdateMember = async (id, updateFields) => {
+  // Mock request (req) object with body
+  const req = {
+    body: { id, ...updateFields },
+  };
+
+  // Mock response (res) object
+  const res = {
+    status: function (statusCode) {
+      this.statusCode = statusCode;
+      return this;
+    },
+    json: function (data) {
+      console.log('Status:', this.statusCode);
+      console.log('JSON Response:', JSON.stringify(data, null, 2));
+    },
+  };
+
+  try {
+    // Call the controller directly with the mocked req and res
+    await updateMember(req, res);
+  } catch (error) {
+    console.error('Error:', error);
+  }
+};
+
 // Test the controller with a specific member's first_name, last_name, and birth_date
 testGetMemberByAttribute('Sebald', 'Horn', '1930-01-01');
 
 // Test the controller with a specific relationship's member_1_id, member_2_id, and relationship
 testGetRelationshipByAttributes(1, 7, 'spouse');
+
+// Test the controller with a specific member's id and update fields
+testUpdateMember(33, { first_name: 'Updated First Name', last_name: 'Updated Last Name', email: 'updated@email.de' });
