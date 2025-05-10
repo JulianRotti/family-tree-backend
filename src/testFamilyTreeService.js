@@ -13,7 +13,7 @@ const testFamilyTreeService = async (memberId) => {
     console.log('Family Tree for Member ID:', memberId);
     
     // Use JSON.stringify to display the full nested structure
-    console.log('Family Tree:', JSON.stringify(familyTree.family_tree_by_id, null, 2));  // Pretty print with 2 spaces
+    console.log('Family Tree:', JSON.stringify(familyTree.familyTreeById, null, 2));  // Pretty print with 2 spaces
     // console.log('Members:', familyTree.members);
 
   } catch (error) {

@@ -125,7 +125,7 @@ export const getFamilyTreeById = async (id, w_node, w_partner, w_children) => {
         const familyTree = buildFamilyTreeWithIdsAndSubtreeLen(id, relationships, w_node, w_partner, w_children);
 
         // Return the family tree (IDs only) and the member metadata
-        return { family_tree_by_id: familyTree, members: members };
+        return { familyTreeById: familyTree, members: members };
     } catch (error) {
         console.error('Error fetching family tree:', error);
         throw new Error('Could not fetch family tree');

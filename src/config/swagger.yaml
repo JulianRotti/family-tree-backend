@@ -108,7 +108,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  family_tree_by_id:
+                  familyTreeById:
                     $ref: '#/components/schemas/MemberTree'
                   members:
                     type: array

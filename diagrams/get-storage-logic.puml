@@ -1,0 +1,29 @@
+@startuml get-storage-logic
+package "Frontend" {
+  [Form Component]
+  [HTTP Client]
+}
+
+package "Backend" {
+  [REST Controller]
+  [Data Repository]
+  [ImageStore Adapter]
+}
+
+' User clicks “load” → Form Component kicks off HTTP Client
+[Form Component] --> [HTTP Client] : get(id)
+
+' Frontend → Backend
+[HTTP Client] --> [REST Controller] : GET /record/{id}
+
+' Backend fetches raw data
+[REST Controller] --> [Data Repository] : fetch(data, url)
+[Data Repository] --> [REST Controller] : data, url
+
+' Convert to single-use link
+[REST Controller] --> [ImageStore Adapter] : makeSingleUse(url)
+[ImageStore Adapter] --> [REST Controller] : singleUseUrl
+
+' Return payload to UI
+[REST Controller] --> [HTTP Client] : return(data, singleUseUrl)
+@enduml

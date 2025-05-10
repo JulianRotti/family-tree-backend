@@ -47,6 +47,9 @@ const Member = sequelize.define('Member', {
     city: {
         type: DataTypes.STRING,
     },
+    image_path: {
+        type: DataTypes.STRING,
+    },
 }, {
     timestamps: false, // Assuming your table does not have createdAt/updatedAt columns
     tableName: 'members', // Ensure this matches your existing table name

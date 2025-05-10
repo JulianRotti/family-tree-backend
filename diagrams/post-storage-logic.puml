@@ -1,0 +1,22 @@
+@startuml post-storage-logic
+package “Frontend” {
+  [Form Component]
+  [HTTP Client]
+}
+
+package “Backend” {
+  [REST Controller]
+  [Transaction Manager]
+  [Data Repository]
+  [ImageStore Adapter]
+}
+
+[Form Component] --> [HTTP Client] : post(data,image)\nget(id)
+[HTTP Client] --> [REST Controller]
+[REST Controller] --> [Transaction Manager] : begin()
+[Transaction Manager] --> [Data Repository] : save(data)
+[Transaction Manager] --> [ImageStore Adapter] : store(image)
+[ImageStore Adapter] --> [Transaction Manager] : url
+[Transaction Manager] --> [Data Repository] : save(url)
+[Transaction Manager] --> [REST Controller] : commit()
+@enduml

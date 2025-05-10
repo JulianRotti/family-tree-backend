@@ -2,6 +2,12 @@
 
 import * as familyService from '../services/familyService.js';
 import * as familyTreeService from '../services/familyTreeService.js'; 
+import * as fileStorageService from '../services/storage/fileStorageService.js';
+
+/* Todos
+- wrap upload file and create member in a transaction with rollback
+- upload logic for updateMember (if path contains filename => okay, else delete old file and upload new file)
+*/
 
 // Fetch all members
 export const getAllMembers = async (req, res) => {
@@ -41,10 +47,29 @@ export const getMemberByAttributes = async (req, res) => {
     }
 };
 
+export const getMemberById = async (req, res) => {
+    const { id } = req.params; 
+    try {
+        const member = await familyService.getMemberById(id);
+        if (member) {
+            res.status(200).json(member);
+        } else {
+            res.status(404).json({ error: 'Mitglied nicht gefunden.' });
+        }
+    } catch (error) {
+        res.status(500).json({ error: `Fehler beim Abrufen des Mitglieds: ${error}.` });
+    }
+};
+
 // Create a new member
 export const createMember = async (req, res) => {
+    //process.stdout.write("test start\n");
     try {
-        const newMember = await familyService.createMember(req.body);
+        let image_path = null;
+        if (req.file) {
+            image_path = await fileStorageService.saveImageAndReturnUrl(req);
+        }
+        const newMember = await familyService.createMember({ ...req.body, image_path });
         res.status(201).json(newMember);
     } catch (error) {
         res.status(500).json({ error: `Fehler beim Erstellen des Mitglieds: ${error}.` });

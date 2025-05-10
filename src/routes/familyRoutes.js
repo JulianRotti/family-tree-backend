@@ -7,6 +7,7 @@ import { validateDoubleMember, validateMember } from '../middleware/validateMemb
 import { validateRelationship } from '../middleware/validateRelationship.js';
 import { validateTokenAndRole } from '../middleware/validateTokenAndRole.js';
 import { convertToNull } from '../middleware/convertToNull.js';
+import { parseFormData } from '../middleware/parseFormData.js';
 import { 
     getAllMembers, 
     updateMember, 
@@ -14,6 +15,7 @@ import {
     getAllRelationships, 
     createRelationship, 
     getFamilyTreeById,
+    getMemberById
 } from '../controllers/familyController.js';
 
 const router = express.Router();
@@ -33,9 +35,16 @@ router.get(
     validateTokenAndRole('viewer'), 
     getAllMembers
 );
+router.get(
+    '/members/:id', 
+    validateTokenAndRole('viewer'), 
+    validateId, 
+    getMemberById
+);
 router.post(
     '/members', 
     validateTokenAndRole('editor'), 
+    parseFormData,
     validateMember,
     validateDoubleMember,
     convertToNull,

@@ -2,10 +2,11 @@ import Member from '../models/members.js';
 import Relationship from '../models/relationships.js';
 
 /* Todos
-- add modify / put endpoit for members and relationships
+- add modify / put endpoint for members and relationships
 - add delete endpoint for members and relationships
 */
 export const createMember = async (memberData) => {
+    console.log(memberData);
     return await Member.create(memberData);
 };
 
@@ -27,6 +28,10 @@ export const createRelationship = async (relationshipData) => {
 export const getAllMembers = async () => {
     return await Member.findAll();
 };
+
+export const getMemberById = async (id) => {
+    return await Member.findByPk(id);
+}
 
 export const getAllRelationships = async () => {
     return await Relationship.findAll();
